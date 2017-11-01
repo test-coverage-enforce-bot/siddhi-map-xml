@@ -26,7 +26,6 @@ import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
-import org.wso2.siddhi.core.exception.SiddhiAppRuntimeException;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.core.util.transport.InMemoryBroker;
@@ -1072,7 +1071,7 @@ public class XmlSourceMapperTestCase {
         siddhiManager.shutdown();
     }
 
-    @Test(expectedExceptions = SiddhiAppRuntimeException.class)
+    @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void testXmlInputMappingCustom123() throws InterruptedException {
         log.info("Test case for enclosing Element XPath.");
 
