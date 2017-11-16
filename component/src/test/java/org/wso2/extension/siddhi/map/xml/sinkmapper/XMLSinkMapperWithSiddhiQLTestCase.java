@@ -24,7 +24,6 @@ import org.testng.annotations.Test;
 import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.exception.NoSuchAttributeException;
 import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.sink.InMemorySink;
@@ -857,7 +856,7 @@ public class XMLSinkMapperWithSiddhiQLTestCase {
     //    select symbol,price
     //    publish inMemory options ("topic", "{{symbol}}")
     //    map xml custom
-    @Test(expectedExceptions = NoSuchAttributeException.class)
+    @Test(expectedExceptions = SiddhiAppCreationException.class)
     public void testNoSuchAttributeExceptionForXMLOutputMapping() throws InterruptedException {
         log.info("Test for non existing attribute in xml mapping with SiddhiQL - expects NoSuchAttributeException");
 
