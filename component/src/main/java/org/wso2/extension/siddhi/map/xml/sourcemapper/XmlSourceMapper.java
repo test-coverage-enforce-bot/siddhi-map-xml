@@ -279,21 +279,22 @@ public class XmlSourceMapper extends SourceMapper {
         } else if (eventObject instanceof OMElement) {
             rootOMElement = (OMElement) eventObject;
         } else if (eventObject instanceof byte[]) {
+            String events = null;
             try {
-                String events = new String((byte[]) eventObject, "UTF-8");
+                events = new String((byte[]) eventObject, "UTF-8");
                 rootOMElement = AXIOMUtil.stringToOM(events);
             } catch (UnsupportedEncodingException e) {
                 log.error("Error is encountered while decoding the byte stream. Please note that only UTF-8 "
                         + "encoding is supported" + e.getMessage(), e);
                 return new Event[0];
             } catch (XMLStreamException | DeferredParsingException e) {
-                log.warn("Error parsing incoming XML event : " + eventObject + ". Reason: " + e.getMessage() +
+                log.warn("Error parsing incoming XML event : " + events + ". Reason: " + e.getMessage() +
                         ". Hence dropping message chunk");
                 return new Event[0];
             }
         } else {
-            log.warn("Event object is invalid. Expected String/OMElement, but found " + eventObject.getClass()
-                    .getCanonicalName());
+            log.warn("Event object is invalid. Expected String/OMElement or Byte Array, but found "
+                    + eventObject.getClass().getCanonicalName());
             return new Event[0];
         }
 
