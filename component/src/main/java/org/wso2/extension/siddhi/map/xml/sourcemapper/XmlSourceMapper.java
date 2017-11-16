@@ -41,6 +41,7 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.exception.SiddhiAppValidationException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -228,7 +229,7 @@ public class XmlSourceMapper extends SourceMapper {
     }
 
     @Override public Class[] getSupportedInputEventClasses() {
-        return new Class[]{String.class, OMElement.class};
+        return new Class[]{String.class, OMElement.class, byte[].class};
     }
 
     /**
@@ -265,22 +266,38 @@ public class XmlSourceMapper extends SourceMapper {
      */
     private Event[] convertToEvents(Object eventObject) {
         List<Event> eventList = new ArrayList<>();
+
         OMElement rootOMElement;
         if (eventObject instanceof String) {
             try {
                 rootOMElement = AXIOMUtil.stringToOM((String) eventObject);
             } catch (XMLStreamException | DeferredParsingException e) {
-                log.warn("Error parsing incoming XML event : " + eventObject + ". Reason: " + e.getMessage() +
-                        ". Hence dropping message chunk");
+                log.warn("Error parsing incoming XML event : " + eventObject + ". Reason: " + e.getMessage()
+                        + ". Hence dropping message chunk");
                 return new Event[0];
             }
         } else if (eventObject instanceof OMElement) {
             rootOMElement = (OMElement) eventObject;
+        } else if (eventObject instanceof byte[]) {
+            String events = null;
+            try {
+                events = new String((byte[]) eventObject, "UTF-8");
+                rootOMElement = AXIOMUtil.stringToOM(events);
+            } catch (UnsupportedEncodingException e) {
+                log.error("Error is encountered while decoding the byte stream. Please note that only UTF-8 "
+                        + "encoding is supported" + e.getMessage(), e);
+                return new Event[0];
+            } catch (XMLStreamException | DeferredParsingException e) {
+                log.warn("Error parsing incoming XML event : " + events + ". Reason: " + e.getMessage() +
+                        ". Hence dropping message chunk");
+                return new Event[0];
+            }
         } else {
-            log.warn("Event object is invalid. Expected String/OMElement, but found " +
-                    eventObject.getClass().getCanonicalName());
+            log.warn("Event object is invalid. Expected String/OMElement or Byte Array, but found "
+                    + eventObject.getClass().getCanonicalName());
             return new Event[0];
         }
+
         if (isCustomMappingEnabled) {   //custom mapping case
             if (enclosingElementSelectorPath != null) {  //has multiple events
                 List enclosingNodeList;
